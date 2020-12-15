@@ -13,7 +13,7 @@ module.exports = {
         const args = Env.args;
         var model = Session.getModel();
         if (!model) {
-            model = await tf.loadLayersModel("file:///Users/phone/OneDrive/Desktop/TextAI/model.json");
+            model = await tf.loadLayersModel("file:///root/Learner/TextAI/model.json");
             Session.addModel(model);
         }
 
