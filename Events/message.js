@@ -36,5 +36,6 @@ module.exports = {
         if (message.channel.name.toLowerCase() == "training") {
             Session.receive(message);
         }
+        
     },
 };

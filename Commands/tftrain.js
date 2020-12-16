@@ -7,7 +7,7 @@ module.exports = {
     async execute(Env) {
         const message = Env.message;
 
-        if (message.author.id != "682229927864696835"&&essage.author.id != "683343114865606686") {
+        if (message.author.id != "682229927864696835"&&message.author.id != "683343114865606686") {
             const ErrorEmbed = new Discord.MessageEmbed()
                 .setTitle("**Insufficient Permission**")
                 .setDescription("No");
@@ -15,7 +15,7 @@ module.exports = {
         }
         message.channel.send("Please wait... Model is being trained");
         var Model = await trainAI();
-        Model.save("file:///root/Learner/TextAI/");
+        Model.save("file:///root/jarvis/TextAI/");
         Session.addModel(Model);
         message.channel.send("AI Succcessfully trained");
     }

@@ -1,14 +1,14 @@
-// Lol i didn't make this btw just stole it off the internet
+
 
 const JaroWinkler = function (s1, s2) {
     var m = 0;
 
-    // Exit early if either are empty.
+
     if (s1.length === 0 || s2.length === 0) {
         return 0;
     }
 
-    // Exit early if they're an exact match.
+
     if (s1 === s2) {
         return 1;
     }
@@ -30,12 +30,12 @@ const JaroWinkler = function (s1, s2) {
         }
     }
 
-    // Exit early if no matches were found.
+
     if (m === 0) {
         return 0;
     }
 
-    // Count the transpositions.
+
     var k = n_trans = 0;
 
     for (i = 0; i < s1.length; i++) {
