@@ -1,35 +1,36 @@
-const Command = require("../Src/Handlers/CommandHandler");
-const conf = require("../Settings/conf.json");
-const Session = require("../Training/Session.js");
+const Discord = require("discord.js");
+const Fs = require("fs");
+const Session = require("../../Training/Session.js");
 const use = require("@tensorflow-models/universal-sentence-encoder");
 const tf = require("@tensorflow/tfjs-node");
-const JW = require("../Training/JaroWinkler.js");
+const JW = require("../../Training/JaroWinkler.js");
 
-const Message = async(client, message) => {
-    if (message.author.bot) return;
-    if (message.channel.type === "dm") return;
-    if (message.content.indexOf(conf.Discord.prefix) !== 0) return;
-    if (!message.content.startsWith(conf.Discord.prefix)) return;
-
-    const args = message.content.slice(conf.Discord.prefix.length).trim().split(/ +/g);
-    let cmd = args.shift().toLowerCase();
-
-    Command.trigger(client, message, args, cmd);
-    
-    const tox = require('../toxication')
-    tox(message)
-    if (message.channel.name === 'chatbot'&&message.author.id != client.user.id||message.channel.id === '784635225962577990'&&message.author.id != client.user.id) {
-        args = message.content.slice().trim().split(/ +/g);
+module.exports.run = (client, message,args) => {
     var model = Session.getModel();
     if (!model) {
         model = await tf.loadLayersModel("file:///home/container/TextAI/model.json");
-    
         Session.addModel(model);
     }
-        let phrase = args.slice(0 ).join(" ")
-    
-        message.channel.startTyping();
-        const sentenceEncoder = await use.load();
+
+    var phrase = args.slice(1).join(" ");
+    if (!phrase) {
+        const ErrorEmbed = new Discord.MessageEmbed()
+            .setTitle("**ERROR**")
+            .setDescription("Please specify a phrase to test");
+        return message.channel.send(ErrorEmbed);
+    }
+
+    if (new Date().getTime() - lastcommand < 1000) {
+        const ErrorEmbed = new Discord.MessageEmbed()
+            .setTitle("**ERROR**")
+            .setDescription("Please wait a bit before consecutive requests.");
+        return message.channel.send(ErrorEmbed);
+    }
+    lastcommand = new Date().getTime();
+
+    message.channel.startTyping();
+
+    const sentenceEncoder = await use.load();
     var Data = [{ message: phrase }];
     var Sentences = Data.map(t => t.message.toLowerCase());
     const xPredict = await sentenceEncoder.embed(Sentences);
@@ -57,7 +58,7 @@ const Message = async(client, message) => {
             break;
     }
 
-    var Dataset = JSON.parse(Fs.readFileSync("./Convo/Dataset.json"));
+    var Dataset = JSON.parse(Fs.readFileSync("../../Convo/Dataset.json"));
     var input = [undefined, 0];
 
     Dataset[predicted.toLowerCase()].patterns.forEach(msg => {
@@ -84,18 +85,27 @@ const Message = async(client, message) => {
         })
     }
     message.channel.stopTyping();
-    message.channel.send(`**> Replying to ${message.member.user.username}** \n` + possibleResponses[Math.floor(Math.random() * possibleResponses.length)])
+    message.channel.send(possibleResponses[Math.floor(Math.random() * possibleResponses.length)])
 
-    var Meta = JSON.parse(Fs.readFileSync("./Training/Meta.json"));
+    var Meta = JSON.parse(Fs.readFileSync("../../Training/Meta.json"));
     if (Meta.selflearning && highest[1] > 0.6) {
         if (Dataset[predicted.toLowerCase()].patterns.includes(phrase)) return;
         Dataset[predicted.toLowerCase()].patterns.push(phrase);
-        Fs.writeFileSync("./Convo/Dataset.json", JSON.stringify(Dataset));
+        Fs.writeFileSync("../../Convo/Dataset.json", JSON.stringify(Dataset));
     }
-    
-    }
-     message.channel.stopTyping();
-     
 };
 
-module.exports.init = Message;
+
+module.exports.help = {
+    name: "learner",
+    aliases: ["lnr","learner"],
+    description: "learner :D",
+    usage: "(command name)<word>",
+    category: "chat",
+    cooldown: 200 // Counted in MS
+};
+
+module.exports.config = {
+    restricted: false,
+    ownerOnly: false
+};

@@ -1,0 +1,15 @@
+{
+    "Discord": {
+        "owner": "682229927864696835",
+        "token": "NzgzNTkwNTQwMDA3OTY0Njcy.X8c9jw.KxJ2x5lpYUeEXI63dgcZ-5WJ7NU",
+        "prefix": "~",
+        "invite_link_perms": [
+            "SEND_MESSAGES",
+            "MANAGE_GUILD",
+            "EMBED_LINKS"
+        ],
+        "bot_admins": [
+            "682229927864696835"
+        ]
+    }
+}
